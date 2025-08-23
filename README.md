@@ -1,4 +1,4 @@
-# CMU 15-418/618, Spring 2023
+# CMU 15-418/618, Fall 2025
 
 # Assignment 1
 
