@@ -124,41 +124,23 @@ void* workerThreadStart(void* threadArgs) {
 
     // TODO: Implement worker thread here.
 
-    int totalRows = args->height;
-    int rowsPerThread = totalRows / args->numThreads;
-    int remainder = totalRows % args->numThreads;
+    float dx = (args->x1 - args->x0) / args->width;
+    float dy = (args->y1 - args->y0) / args->height;
 
-    int startRow;
-    int endRow;
+    for (int j = args->threadId; j < (int)args->height; j += args->numThreads) {
+        for (int i = 0; i < (int)args->width; ++i) {
+            float x = args->x0 + i * dx;
+            float y = args->y0 + j * dy;
 
-    if (args->threadId < remainder) {
-        startRow = args->threadId * (rowsPerThread + 1);
-        endRow = startRow + rowsPerThread + 1;
-    } else {
-        startRow = remainder * (rowsPerThread + 1) + (args->threadId - remainder) * rowsPerThread;
-        endRow = startRow + rowsPerThread;
+            int index = (j * args->width + i);
+            args->output[index] = mandel(x, y, args->maxIterations);
+        }
     }
-
-    // if (args->threadId == 0) {
-    //     startRow = 0;
-    //     endRow = args->height / 2;
-    // } else {
-    //     startRow = args->height / 2;
-    //     endRow = args->height;
-    // }
-
-    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
-                     args->width, args->height,
-                     startRow, endRow,
-                     args->maxIterations,
-                     args->output);
 
     double endTime = CycleTimer::currentSeconds();
     double threadTime = (endTime - startTime) * 1000; // ms
 
     printf("Thread %d: %.2f ms\n", args->threadId, threadTime);
-
-    printf("Hello world from thread %d\n", args->threadId);
 
     return NULL;
 }
