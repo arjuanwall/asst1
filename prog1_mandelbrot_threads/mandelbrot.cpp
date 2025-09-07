@@ -122,16 +122,28 @@ void* workerThreadStart(void* threadArgs) {
 
     // TODO: Implement worker thread here.
 
+    int totalRows = args->height;
+    int rowsPerThread = totalRows / args->numThreads;
+    int remainder = totalRows % args->numThreads;
+
     int startRow;
     int endRow;
 
-    if (args->threadId == 0) {
-        startRow = 0;
-        endRow = args->height / 2;
+    if (args->threadId < remainder) {
+        startRow = args->threadId * (rowsPerThread + 1);
+        endRow = startRow + rowsPerThread + 1;
     } else {
-        startRow = args->height / 2;
-        endRow = args->height;
+        startRow = remainder * (rowsPerThread + 1) + (args->threadId - remainder) * rowsPerThread;
+        endRow = startRow + rowsPerThread;
     }
+
+    // if (args->threadId == 0) {
+    //     startRow = 0;
+    //     endRow = args->height / 2;
+    // } else {
+    //     startRow = args->height / 2;
+    //     endRow = args->height;
+    // }
 
     mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
                      args->width, args->height,
